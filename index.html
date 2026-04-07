@@ -1,0 +1,1215 @@
+  <!doctype html>
+  <html lang="vi">
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <head>
+      <meta charset="utf-8" />
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+      <title>UCHIHA V3</title>
+      <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+      <div class="app">
+        <div class="main">
+          <header class="main-header">
+            <div class="header-left">
+              <img class="brand-gif" src="img/uchiha-hero.gif" alt="UCHIHA" />
+            </div>
+          </header>
+
+          <section class="home-section" id="homeSection">
+            <div class="home-hero">
+              <img class="home-hero-img" src="img/avt.gif" alt="Home banner" />
+            </div>
+            <div class="home-grid">
+              <article class="profile-card">
+                <div class="profile-avatar">
+                  <img src="img/chiduc.png" alt="Ng Chi Duc" />
+                </div>
+                <div class="profile-body">
+                  <h2>Ng Chi Duc</h2>
+                  <p>Developer / Admin UCHIHA V3</p>
+                </div>
+                <div class="profile-links">
+                  <a class="profile-btn facebook" href="https://www.facebook.com/cducdz" target="_blank" rel="noopener">Facebook</a>
+                  <a class="profile-btn zalo" href="https://zalo.me/0396134792">Zalo</a>
+                  <a class="profile-btn tiktok" href="https://www.tiktok.com/@cdzxcv" target="_blank" rel="noopener">TikTok</a>
+            </div>
+              <script>
+        (function(){
+    const API_BASE = 'https://testapi-production-11a6.up.railway.app';
+    const BRAND_TITLE = 'NG CHI DUC API SERVER KEY';
+    const TZ = 'Asia/Ho_Chi_Minh';
+    const ALWAYS_PROMPT = false;
+    const LS = { DEVICE:'vsh_license_device', KEY:'vsh_license_key' };
+
+    let countdownTimer = null;
+    let expireAtMs = 0;
+    let serverNowMs = 0;
+
+    let deviceId = localStorage.getItem(LS.DEVICE);
+    if(!deviceId){
+      deviceId = (crypto.randomUUID?.() || (Date.now().toString(36)+Math.random().toString(36).slice(2,10))).toUpperCase();
+      localStorage.setItem(LS.DEVICE, deviceId);
+    }
+
+    const fmt = (ts)=> ts==null ? 'lifetime' :
+      new Intl.DateTimeFormat('vi-VN',{
+        timeZone:TZ,
+        year:'numeric',month:'2-digit',day:'2-digit',
+        hour:'2-digit',minute:'2-digit',second:'2-digit'
+      }).format(ts);
+
+    function formatLeft(ms){
+      if(ms <= 0) return '0s';
+
+      const totalSec = Math.floor(ms / 1000);
+      const days = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      const secs = totalSec % 60;
+
+      if(days > 0) return `${days}d ${hours}h ${mins}m ${secs}s`;
+      if(hours > 0) return `${hours}h ${mins}m ${secs}s`;
+      if(mins > 0) return `${mins}m ${secs}s`;
+      return `${secs}s`;
+    }
+
+    function startCountdown(data){
+      if(!data || !data.expiresAt) return;
+
+      expireAtMs = Number(data.expiresAt);
+      serverNowMs = Number(data.serverTime || Date.now());
+
+      if(countdownTimer) clearInterval(countdownTimer);
+
+      const el = $('#vgSta');
+      if(!el) return;
+
+      const render = () => {
+        const left = expireAtMs - serverNowMs;
+
+        if(left <= 0){
+          el.textContent = 'Key đã hết hạn';
+          el.style.color = '#ff8f8f';
+          clearInterval(countdownTimer);
+          countdownTimer = null;
+          return;
+        }
+
+        el.textContent = `Còn lại: ${formatLeft(left)}`;
+        el.style.color = left <= 3600000 ? '#ffd36b' : '#9fb0d0';
+        serverNowMs += 1000;
+      };
+
+      render();
+      countdownTimer = setInterval(render, 1000);
+    }
+
+    async function post(_, data){
+      const r = await fetch(API_BASE + '/checkKey',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(data)
+      });
+
+      const j = await r.json().catch(()=>({success:false,message:'SERVER_ERROR'}));
+
+      if(j.success){
+        return {
+          ok: true,
+          data: {
+            expiresAt: j.expireAt,
+            serverTime: j.serverTime,
+            deviceId: data.deviceId
+          }
+        };
+      }
+
+      return {
+        ok: false,
+        error: j.message || 'Key lỗi'
+      };
+    }
+
+    function ting(){
+      try{
+        const AC = new (window.AudioContext||window.webkitAudioContext)();
+        const o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime;
+        o.type='sine'; o.frequency.value=1200;
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.18,t+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.16);
+        o.connect(g).connect(AC.destination); o.start(t); o.stop(t+0.17);
+      }catch{}
+    }
+
+    const css = `
+    #vgGate{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;background:rgba(8,10,15,.72);backdrop-filter:blur(6px)}
+    #vgGate .vg-panel{width:min(620px,92vw);border:1px solid #2a2d3f;border-radius:16px;overflow:hidden;color:#e8e7ff;
+      font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));box-shadow:0 24px 60px rgba(0,0,0,.55)}
+    #vgGate .vg-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid #2a2d3f}
+    #vgGate .vg-brand{font-weight:900;letter-spacing:.3px;white-space:nowrap}
+    #vgGate .vg-hd-rt{display:flex;gap:8px}
+    #vgGate .vg-btn{padding:9px 14px;border-radius:10px;border:1px solid #3a3f56;background:#191f2a;color:#e8e7ff;cursor:pointer}
+    #vgGate .vg-btn:hover{filter:brightness(1.08)}
+    #vgGate .vg-btn--pri{background:#1e293b;border-color:#405075}
+    #vgGate .vg-btn--ghost{background:#141924}
+    #vgGate .vg-bd{padding:16px}
+    #vgGate .vg-label{font-size:12px;color:#aab4d6;margin:0 0 6px 0}
+    #vgGate .vg-field{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+    #vgGate .vg-input{padding:11px 12px;border-radius:10px;border:1px solid #3a3f56;background:#0c1017;color:#e8e7ff;width:100%}
+    #vgGate .vg-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;}
+    #vgGate .vg-msg{margin-top:12px;padding:12px;border-radius:12px;border:1px solid #2a2d3f;background:#0b1118;font-size:13px;line-height:1.45}
+    #vgGate .vg-msg.ok{border-color:#2f9e44;background:#0d1a12;color:#b9ffd1}
+    #vgGate .vg-msg.warn{border-color:#b8860b;background:#1b1607;color:#ffe9b0}
+    #vgGate .vg-msg.err{border-color:#b02a37;background:#1a0f12;color:#ffd1d6}
+    #vgGate .vg-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:#9fb0d0;font-size:12px}
+    `;
+
+    const st = document.createElement('style');
+    st.textContent = css;
+    document.head.appendChild(st);
+
+    function $(sel){ return document.querySelector(sel); }
+
+    function build(){
+      let wrap = $('#vgGate');
+      if(wrap) return wrap;
+
+      wrap = document.createElement('div');
+      wrap.id = 'vgGate';
+      wrap.innerHTML = `
+        <div class="vg-panel">
+          <div class="vg-hd">
+            <div class="vg-brand">${BRAND_TITLE}</div>
+          </div>
+
+          <div class="vg-bd">
+            <div class="vg-label">Mã Kích Hoạt</div>
+            <input id="vgKey" class="vg-input" placeholder="Dán key...">
+
+            <div class="vg-actions">
+              <button class="vg-btn vg-btn--pri" id="vgCheck">Kiểm tra</button>
+              <button class="vg-btn vg-btn--pri" id="vgActive">Kích hoạt</button>
+              <button class="vg-btn vg-btn--ghost" id="vgContact">Liên hệ mua key</button>
+              <button class="vg-btn vg-btn--free" id="vgFree">Lấy key 1 ngày free</button>
+            </div>
+
+            <div class="vg-msg" id="vgMsg">Sẵn sàng</div>
+
+            <div class="vg-foot">
+              <span id="vgSta">Chưa kích hoạt</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(wrap);
+
+      $('#vgCheck').onclick = onCheck;
+      $('#vgActive').onclick = onActivate;
+      $('#vgContact').onclick = onContact;
+      $('#vgFree').onclick = onFreeKey;
+
+      return wrap;
+    }
+
+    function onFreeKey(){
+      window.open('https://linkbio.co/chiducdz992','_blank');
+    }
+
+    function setMsg(type, html){
+      const box = $('#vgMsg');
+      box.className = 'vg-msg '+(type||'');
+      box.innerHTML = html;
+      ting();
+    }
+
+    function onContact(){
+      if (document.querySelector(".contact-popup")) return;
+
+      const popup = document.createElement("div");
+      popup.className = "contact-popup";
+      popup.innerHTML = `
+        <div class="contact-content">
+          <h3>Liên hệ mua key</h3>
+          <button class="zalo-btn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg">
+            <span>Zalo</span>
+          </button>
+          <button class="fb-btn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg">
+            <span>Facebook</span>
+          </button>
+          <button class="close-btn">Huỷ</button>
+        </div>
+      `;
+
+      document.body.appendChild(popup);
+
+      popup.querySelector(".zalo-btn").onclick = () => {
+        window.open("https://zalo.me/0396134792", "_blank");
+      };
+
+      popup.querySelector(".fb-btn").onclick = () => {
+        window.open("https://facebook.com/cducdz", "_blank");
+      };
+
+      popup.querySelector(".close-btn").onclick = () => {
+        popup.remove();
+      };
+
+      popup.onclick = (e) => {
+        if (e.target === popup) popup.remove();
+      };
+    }
+
+    function updateStatus(data){
+    const el = $('#vgSta');
+    if(!el) return;
+
+    if(!data || !data.expiresAt){
+      el.textContent = "Chưa kích hoạt";
+      el.style.color = "#9fb0d0";
+      return;
+    }
+
+    let now = Date.now();
+    let left = data.expiresAt - now;
+
+    if(left <= 0){
+      el.textContent = "⛔ Key đã hết hạn";
+      el.style.color = "#ff6b6b";
+      return;
+    }
+
+    let totalSec = Math.floor(left / 1000);
+    let h = Math.floor(totalSec / 3600);
+    let m = Math.floor((totalSec % 3600) / 60);
+
+    el.textContent = `Còn lại: ${h}h ${m}m`;
+    el.style.color = "#9fb0d0";
+  }
+
+    async function onCheck(){
+      const key = $('#vgKey').value.trim();
+      if(!key) return setMsg('warn','Vui lòng nhập key');
+
+      setMsg('', 'Đang kiểm tra...');
+      const j = await post('',{ key, deviceId });
+
+      if(j.ok){
+        localStorage.setItem(LS.KEY,key);
+        updateStatus(j.data);
+        setMsg('ok', `Key hợp lệ<br>Hết hạn: <b>${fmt(j.data.expiresAt)}</b>`);
+      }else{
+        setMsg('err', j.error);
+
+  // hiển thị status theo lỗi
+  const el = $('#vgSta');
+
+  if(j.error.includes("không tồn tại")){
+    el.textContent = "❌ Key không tồn tại";
+    el.style.color = "#ff6b6b";
+  }
+  else if(j.error.includes("khóa")){
+    el.textContent = "🚫 Key bị ban";
+    el.style.color = "#ff9f43";
+  }
+  else if(j.error.includes("hết hạn")){
+    el.textContent = "⛔ Key đã hết hạn";
+    el.style.color = "#ff6b6b";
+  }
+      }
+    }
+
+    async function onActivate(){
+      const key = $('#vgKey').value.trim();
+      if(!key) return setMsg('warn','Vui lòng nhập key');
+
+      setMsg('', 'Đang kích hoạt...');
+      const j = await post('',{ key, deviceId });
+
+      if(j.ok){
+        localStorage.setItem(LS.KEY,key);
+        updateStatus(j.data);
+        setMsg('ok', `Kích hoạt thành công<br>Hết hạn: <b>${fmt(j.data.expiresAt)}</b>`);
+        setTimeout(()=>hide(),1000);
+      }else{
+        setMsg('err', j.error);
+      }
+    }
+
+    function show(){ build(); $('#vgGate').style.display='grid'; }
+    function hide(){ $('#vgGate').style.display='none'; }
+
+  async function guardOnLoad(){
+    show(); // luôn hiện login trước
+
+    const savedKey = localStorage.getItem(LS.KEY);
+    if(!savedKey) return;
+
+    setTimeout(async ()=>{
+      const input = $('#vgKey');
+      if(input){
+        input.value = savedKey;
+      }
+
+      // auto check + activate
+      const v = await post('',{ key:savedKey, deviceId });
+
+      if(v.ok){
+        updateStatus(v.data);
+
+        setMsg('ok', `Kích hoạt tự động thành công<br>Hết hạn: <b>${fmt(v.data.expiresAt)}</b>`);
+
+        // 🔥 ẩn login sau 1 chút
+        setTimeout(()=>{
+          hide();
+        },800);
+
+      }else{
+        setMsg('err', v.error);
+
+        const el = $('#vgSta');
+        if(!el) return;
+
+        if(v.error.includes("không tồn tại")){
+          el.textContent = "❌ Key không tồn tại";
+        }
+        else if(v.error.includes("khóa")){
+          el.textContent = "🚫 Key bị ban";
+        }
+        else if(v.error.includes("hết hạn")){
+          el.textContent = "⛔ Key đã hết hạn";
+        }
+      }
+
+    },100);
+  }
+
+    if(document.readyState==='loading')
+      document.addEventListener('DOMContentLoaded', guardOnLoad);
+    else guardOnLoad();
+
+  })();
+        </script>
+          </section>
+          <section class="premium-banner" id="premiumSection">
+            <div class="premium-head">
+              <div class="premium-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 18h16v2H4zM4 6l4 6 4-6 4 6 4-6v10H4z" />
+  <defs>
+    <linearGradient id="crownGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8a2eff"/>
+      <stop offset="100%" stop-color="#00f0ff"/>
+    </linearGradient>
+  </defs>
+                </svg>
+              </div>
+              <div class="premium-text">
+                <p class="premium-title">MODE PREMIUM VIP</p>
+              </div>
+            </div>
+
+            <div class="feature-list">
+              <div class="feature-grid">
+                <div class="feature-item">
+                  <div>
+                    <p class="feature-name">AimLock Head</p>
+                    <p class="feature-sub">Bám Đầu</p>
+                  </div>
+                  <label class="toggle">
+                    <input id="aimlockToggle" class="sound-toggle" type="checkbox" />
+                    <span class="switch" aria-hidden="true"></span>
+                  </label>
+                </div>
+                <div class="feature-item">
+                  <div>
+                    <p class="feature-name">Stability Assist</p>
+                    <p class="feature-sub">Nhẹ Tâm</p>
+                  </div>
+                  <label class="toggle">
+                    <input id="stabilityAssistToggle" class="sound-toggle" type="checkbox" />
+                    <span class="switch" aria-hidden="true"></span>
+                  </label>
+                </div>
+                <div class="feature-item">
+                  <div>
+                    <p class="feature-name">Aim Hold</p>
+                    <p class="feature-sub">Ghìm Tâm</p>
+                  </div>
+                  <label class="toggle">
+                    <input id="aimHoldToggle" class="sound-toggle" type="checkbox" />
+                    <span class="switch" aria-hidden="true"></span>
+                  </label>
+                </div>
+                <div class="feature-item">
+                  <div>
+                    <p class="feature-name">Aim LockDown</p>
+                    <p class="feature-sub">Đầm Tâm</p>
+                  </div>
+                  <label class="toggle">
+                    <input id="aimLockdownToggle" class="sound-toggle" type="checkbox" />
+                    <span class="switch" aria-hidden="true"></span>
+                  </label>
+                </div>
+                <div class="feature-item">
+                  <div>
+                    <p class="feature-name">Sensitivity Boost</p>
+                    <p class="feature-sub">Nhạy</p>
+                  </div>
+                  <label class="toggle">
+                    <input id="sensitivityBoostToggle" class="sound-toggle" type="checkbox" />
+                    <span class="switch" aria-hidden="true"></span>
+                  </label>
+                </div>
+                <div class="feature-item">
+                  <div>
+                    <p class="feature-name">Screen Boost</p>
+                    <p class="feature-sub">Buff Màn</p>
+                  </div>
+                  <label class="toggle">
+                    <input id="screenBoostToggle" class="sound-toggle" type="checkbox" />
+                    <span class="switch" aria-hidden="true"></span>
+                  </label>
+                </div>
+                <div class="feature-item">
+                  <div>
+                    <p class="feature-name">HeadShot Fix</p>
+                    <p class="feature-sub">Fix Lố Đầu</p>
+                  </div>
+                  <label class="toggle">
+                    <input id="headshotFixToggle" class="sound-toggle" type="checkbox" />
+                    <span class="switch" aria-hidden="true"></span>
+                  </label>
+                </div>
+                <div class="feature-item">
+                  <div>
+                    <p class="feature-name">Bullet
+  Align</p>
+                    <p class="feature-sub">Fix Lạc Đạn</p>
+                  </div>
+                  <label class="toggle">
+                    <input id="bulletAlignToggle" class="sound-toggle" type="checkbox" />
+                    <span class="switch" aria-hidden="true"></span>
+                  </label>
+                </div>
+                <div class="feature-item">
+                  <div>
+                    <p class="feature-name">Shake Fix</p>
+                    <p class="feature-sub">Fix Rung</p>
+                  </div>
+                  <label class="toggle">
+                    <input id="shakeFixToggle" class="sound-toggle" type="checkbox" />
+                    <span class="switch" aria-hidden="true"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="monitor-section is-hidden" id="monitorSection">
+            <div class="rt-monitor">
+              <div class="wrap">
+                <header>
+                  <div class="title">
+                  </div>
+
+                </header>
+
+                <div class="grid">
+                  <section class="panel">
+                    <div class="panelHead">
+                      <div class="name">CPU & RAM Wave</div>
+                      <div class="meta">
+                        <span class="badge">FPS: <b id="mFps">0</b></span>
+                        <span class="badge">Frame: <b id="mFrame">0.0</b> ms</span>
+                        <span class="badge">CPU est: <b id="mCpu">0</b>%</span>
+                        <span class="badge">RAM: <b id="mRam">N/A</b></span>
+                      </div>
+                    </div>
+
+                    <div class="panelBody">
+                      <div class="charts spaced-top">
+                        <div class="chartBox">
+                          <div class="chartTop">
+                            <span>CPU (ước lượng theo thời gian bận mỗi frame)</span>
+                            <span class="badge">Target: <span id="mTarget">90</span> FPS</span>
+                          </div>
+                          <canvas id="cpuCanvas" width="900" height="180"></canvas>
+                        </div>
+
+                        <div class="chartBox">
+                          <div class="chartTop">
+                            <span>RAM (MB) / Heap Used</span>
+                            <span class="badge">Scale auto</span>
+                          </div>
+                          <canvas id="ramCanvas" width="900" height="180"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="panel">
+                    <div class="panelHead">
+                      <div class="name">Controls</div>
+                    </div>
+
+                    <div class="panelBody controls-panel">
+                      <div class="controls">
+                        <button id="btnLock" class="toggleOn">Lock 90 FPS: OFF</button>
+                        <button id="btnClearConsole">Xóa Console</button>
+                        <button id="btnCleanRam">Dọn RAM</button>
+                        <button id="btnCleanCpu">Dọn CPU</button>
+                        <button id="btnOptRam">Tối Ưu RAM</button>
+                        <button id="btnOptCpu">Tối Ưu CPU</button>
+                        <button id="btnOptFps">Tối Ưu FPS</button>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="panel">
+                    <div class="panelHead">
+                      <div class="name">Console</div>
+                      <div class="meta">
+                        <span class="badge">Logs: <b id="mLogs">0</b></span>
+                        <span class="badge">Errors: <b id="mErrs">0</b></span>
+                      </div>
+                    </div>
+
+                    <div class="panelBody consoleBox">
+                      <div id="consoleView" class="consoleView" aria-label="console"></div>
+
+                      <div class="consoleInput">
+                        <input id="cmd" type="text" placeholder="Nhập lệnh JS rồi Enter..." autocomplete="off" />
+                        <button id="btnExec">Run</button>
+                      </div>
+
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <nav class="bottom-nav" aria-label="Primary">
+        <a class="bottom-item is-active" href="#home" id="homeBottom">
+          <span class="bottom-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z" />
+            </svg>
+          </span>
+          <span class="bottom-label">Home</span>
+        </a>
+        <a class="bottom-item" href="#premiumSection" id="functionBottom">
+          <span class="bottom-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 3v3l-4 2 4 2v3l-7-3v-4zM15 3v3l4 2-4 2v3l7-3v-4zM9 15h6v6H9z" />
+            </svg>
+          </span>
+          <span class="bottom-label">Function</span>
+        </a>
+        <a class="bottom-item" href="#monitorSection" id="monitorBottom">
+          <span class="bottom-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-6l-2 3-2-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" />
+              <path d="M7 12h2l1-3 2 6 2-5 1 2h2" />
+            </svg>
+          </span>
+          <span class="bottom-label">Realtime</span>
+        </a>
+      </nav>
+
+      <div class="modal-backdrop" id="modalBackdrop"></div>
+      <div class="modal" id="limitModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-icon" aria-hidden="true">⚠</div>
+        <div class="modal-content">
+          <p class="modal-title">Vượt Giới Hạn Kích Hoạt</p>
+          <p class="modal-text">Chỉ Cho Phép Bật 7 Chức Năng Tối Đa Đồng Thời.</p>
+        </div>
+      </div>
+      <script src="features80.js"></script>
+      <script src="features81.js"></script>
+      <script src="features82.js"></script>
+      <script src="features83.js"></script>
+      <script src="features84.js"></script>
+      <script src="features85.js"></script>
+      <script src="features86.js"></script>
+      <script src="features87.js"></script>
+      <script src="features88.js"></script>
+      <script src="features89.js"></script>
+      <script src="features90.js"></script>
+      <script src="features91.js"></script>
+      <script src="features92.js"></script>
+      <script src="features93.js"></script>
+      <script src="features94.js"></script>
+      <script src="features95.js"></script>
+      <script src="features96.js"></script>
+      <script src="features97.js"></script>
+      <script src="features98.js"></script>
+      <script src="features99.js"></script>
+      <script src="features100.js"></script>
+      <script src="features101.js"></script>
+      <script src="features102.js"></script>
+      <script src="features103.js"></script>
+      <script src="features104.js"></script>
+      <script src="features105.js"></script>
+      <script src="features106.js"></script>
+      <script src="features107.js"></script>
+      <script src="features108.js"></script>
+      <script src="features109.js"></script>
+      <script src="features110.js"></script>
+      <script src="features111.js"></script>
+      <script src="features112.js"></script>
+      <script src="features113.js"></script>
+      <script src="features114.js"></script>
+      <script src="features115.js"></script>
+      <script src="features116.js"></script>
+      <script src="features117.js"></script>
+      <script src="features118.js"></script>
+      <script src="features119.js"></script>
+      <script src="features120.js"></script>
+      <script src="features121.js"></script>
+      <script src="features122.js"></script>
+      <script src="features123.js"></script>
+      <script src="features124.js"></script>
+      <script src="features125.js"></script>
+      <script src="features126.js"></script>
+      <script src="features127.js"></script>
+      <script src="features128.js"></script>
+      <script src="features129.js"></script>
+      <script src="features130.js"></script>
+      <script src="features131.js"></script>
+      <script src="features132.js"></script>
+      <script src="features133.js"></script>
+      <script src="features134.js"></script>
+      <script src="features135.js"></script>
+      <script src="features136.js"></script>
+      <script src="features137.js"></script>
+      <script src="features138.js"></script>
+      <script src="features139.js"></script>
+      <script src="features140.js"></script>
+      <script src="features141.js"></script>
+      <script src="features142.js"></script>
+      <script src="features143.js"></script>
+      <script src="features144.js"></script>
+      <script src="features145.js"></script>
+      <script src="features146.js"></script>
+      <script src="features147.js"></script>
+      <script src="features148.js"></script>
+      <script src="features149.js"></script>
+      <script src="features150.js"></script>
+      <script src="features151.js"></script>
+      <script src="features152.js"></script>
+      <script src="features153.js"></script>
+      <script src="features154.js"></script>
+      <script src="features155.js"></script>
+      <script src="features156.js"></script>
+      <script src="features157.js"></script>
+      <script src="features158.js"></script>
+      <script src="features159.js"></script>
+      <script src="features160.js"></script>
+      <script src="features161.js"></script>
+      <script src="features162.js"></script>
+      <script src="features163.js"></script>
+      <script src="features164.js"></script>
+      <script src="features165.js"></script>
+      <script src="features166.js"></script>
+      <script src="features167.js"></script>
+      <script src="features168.js"></script>
+      <script src="features169.js"></script>
+      <script src="features170.js"></script>
+      <script src="features171.js"></script>
+      <script src="features172.js"></script>
+      <script src="features173.js"></script>
+      <script src="features174.js"></script>
+      <script src="features175.js"></script>
+      <script src="features176.js"></script>
+      <script src="features177.js"></script>
+      <script src="features178.js"></script>
+      <script src="features179.js"></script>
+      <script src="features180.js"></script>
+      <script src="features181.js"></script>
+      <script src="features182.js"></script>
+      <script src="features183.js"></script>
+      <script src="features184.js"></script>
+      <script src="features185.js"></script>
+      <script src="features186.js"></script>
+      <script src="features187.js"></script>
+      <script src="features188.js"></script>
+      <script src="features189.js"></script>
+      <script src="features190.js"></script>
+      <script src="features191.js"></script>
+      <script src="features192.js"></script>
+      <script src="features193.js"></script>
+      <script src="features194.js"></script>
+      <script src="features195.js"></script>
+      <script src="features196.js"></script>
+      <script src="features197.js"></script>
+      <script src="features198.js"></script>
+      <script src="features199.js"></script>
+      <script src="features200.js"></script>
+      <script src="features201.js"></script>
+      <script src="features202.js"></script>
+      <script src="features203.js"></script>
+      <script src="features204.js"></script>
+      <script src="features205.js"></script>
+      <script src="features206.js"></script>
+      <script src="features207.js"></script>
+      <script src="features208.js"></script>
+      <script src="features208.js"></script>
+      <script src="features209.js"></script>
+      <script src="features210.js"></script>
+      <script src="features211.js"></script>
+      <script src="features212.js"></script>
+      <script src="features213.js"></script>
+      <script src="features214.js"></script>
+      <script src="features215.js"></script>
+      <script src="features216.js"></script>
+      <script src="features217.js"></script>
+      <script src="features218.js"></script>
+      <script src="features219.js"></script>
+      <script src="features220.js"></script>
+      <script src="features221.js"></script>
+      <script src="features222.js"></script>
+      <script src="features223.js"></script>
+      <script src="features224.js"></script>
+      <script src="features225.js"></script>
+      <script src="features226.js"></script>
+      <script src="features227.js"></script>
+      <script src="features228.js"></script>
+      <script src="features229.js"></script>
+      <script src="features230.js"></script>
+      <script src="features231.js"></script>
+      <script src="features232.js"></script>
+      <script src="features233.js"></script>
+      <script src="features234.js"></script>
+      <script src="features235.js"></script>
+      <script src="features236.js"></script>
+      <script src="features237.js"></script>
+      <script src="features238.js"></script>
+      <script src="features239.js"></script>
+      <script src="features240.js"></script>
+      <script src="features241.js"></script>
+      <script src="features242.js"></script>
+      <script src="features243.js"></script>
+      <script src="features244.js"></script>
+      <script src="features245.js"></script>
+      <script src="features246.js"></script>
+      <script src="features247.js"></script>
+      <script src="features248.js"></script>
+      <script src="features249.js"></script>
+      <script src="features250.js"></script>
+      <script src="codecn.html"></script>
+      <script src="codecn1.js"></script>
+      <script src="codecn2.js"></script>
+      <script src="codecn3.js"></script>
+      <script src="codecn4.js"></script>
+      <script src="codecn5.js"></script>
+      <script src="codecn6.js"></script>
+      <script src="codecn7.js"></script>
+      <script src="codecn8.js"></script>
+      <script src="codecn9.js"></script>
+      <script src="codecn10.js"></script>
+      <script src="codecn11.js"></script>
+      <script src="codecn12.js"></script>
+      <script src="codecn13.js"></script>
+      <script src="codecn14.js"></script>
+      <script src="codecn15.js"></script>
+      <script src="codecn16.js"></script>
+      <script src="codecn17.js"></script>
+      <script src="codecn18.js"></script>
+      <script src="codecn19.js"></script>
+      <script src="codecn20.js"></script>
+      <script src="codecn21.js"></script>
+      <script src="codecn22.js"></script>
+      <script src="codecn23.js"></script>
+      <script src="codecn24.js"></script>
+      <script src="codecn25.js"></script>
+      <script src="codecn26.js"></script>
+      <script src="codecn27.js"></script>
+      <script src="codecn28.js"></script>
+      <script src="codecn29.js"></script>
+      <script src="codecn30.js"></script>
+      <script src="codecn31.js"></script>
+      <script src="codecn32.js"></script>
+      <script src="codecn33.js"></script>
+      <script src="codecn34.js"></script>
+      <script src="codecn35.js"></script>
+      <script src="codecn36.js"></script>
+      <script src="codecn37.js"></script>
+      <script src="codecn38.js"></script>
+      <script src="codecn39.js"></script>
+      <script src="codecn40.js"></script>
+      <script src="codecn41.js"></script>
+      <script src="codecn42.js"></script>
+      <script src="codecn43.js"></script>
+      <script src="codecn44.js"></script>
+      <script src="codecn45.js"></script>
+      <script src="codecn46.js"></script>
+      <script src="codecn47.js"></script>
+      <script src="codecn48.js"></script>
+      <script src="codecn49.js"></script>
+      <script src="codecn50.js"></script>
+      <script src="codecn51.js"></script>
+      <script src="codecn52.js"></script>
+      <script src="codecn53.js"></script>
+      <script src="codecn54.js"></script>
+      <script src="codecn55.js"></script>
+      <script src="codecn56.js"></script>
+      <script src="codecn57.js"></script>
+      <script src="codecn58.js"></script>
+      <script src="codecn59.js"></script>
+      <script src="codecn60.js"></script>
+      <script src="codecn61.js"></script>
+      <script src="codecn62.js"></script>
+      <script src="codecn63.js"></script>
+      <script src="codecn64.js"></script>
+      <script src="codecn65.js"></script>
+      <script src="codecn66.js"></script>
+      <script src="codecn67.js"></script>
+      <script src="codecn68.js"></script>
+      <script src="codecn69.js"></script>
+      <script src="codecn70.js"></script>
+      <script src="codecn71.js"></script>
+      <script src="codecn72.js"></script>
+      <script src="codecn73.js"></script>
+      <script src="codecn74.js"></script>
+      <script src="codecn75.js"></script>
+      <script src="codecn76.js"></script>
+      <script src="codecn77.js"></script>
+      <script src="codecn78.js"></script>
+      <script src="codecn79.js"></script>
+      <script src="codecn80.js"></script>
+      <script src="codecn81.js"></script>
+      <script src="codecn82.js"></script>
+      <script src="codecn83.js"></script>
+      <script src="codecn84.js"></script>
+      <script src="codecn85.js"></script>
+      <script src="codecn86.js"></script>
+      <script src="codecn87.js"></script>
+      <script src="codecn88.js"></script>
+      <script src="codecn89.js"></script>
+      <script src="codecn90.js"></script>
+      <script src="codecn91.js"></script>
+      <script src="codecn92.js"></script>
+      <script src="codecn93.js"></script>
+      <script src="codecn94.js"></script>
+      <script src="codecn95.js"></script>
+      <script src="codecn96.js"></script>
+      <script src="codecn97.js"></script>
+      <script src="codecn98.js"></script>
+      <script src="codecn99.js"></script>
+      <script src="codecn100.js"></script>
+      <script src="codecn101.js"></script>
+      <script src="codecn102.js"></script>
+      <script src="codecn103.js"></script>
+      <script src="codecn104.js"></script>
+      <script src="codecn105.js"></script>
+      <script src="codecn106.js"></script>
+      <script src="codecn107.js"></script>
+      <script src="codecn108.js"></script>
+      <script src="codecn109.js"></script>
+      <script src="codecn110.js"></script>
+      <script src="codecn111.js"></script>
+      <script src="codecn112.js"></script>
+      <script src="codecn113.js"></script>
+      <script src="codecn114.js"></script>
+      <script src="codecn115.js"></script>
+      <script src="codecn116.js"></script>
+      <script src="codecn117.js"></script>
+      <script src="codecn118.js"></script>
+      <script src="codecn119.js"></script>
+      <script src="codecn120.js"></script>
+      <script src="codecn121.js"></script>
+      <script src="codecn122.js"></script>
+      <script src="codecn123.js"></script>
+      <script src="codecn124.js"></script>
+      <script src="codecn125.js"></script>
+      <script src="codecn126.js"></script>
+      <script src="codecn127.js"></script>
+      <script src="codecn128.js"></script>
+      <script src="codecn129.js"></script>
+      <script src="codecn130.js"></script>
+      <script src="codecn132.js"></script>
+      <script src="codecn133.js"></script>
+      <script src="codecn134.js"></script>
+      <script src="codecn135.js"></script>
+      <script src="codecn136.js"></script>
+      <script src="codecn137.js"></script>
+      <script src="codecn138.js"></script>
+      <script src="codecn139.js"></script>
+      <script src="codecn140.js"></script>
+      <script src="codecn141.js"></script>
+      <script src="codecn142.js"></script>
+      <script src="codecn143.js"></script>
+      <script src="codecn144.js"></script>
+      <script src="codecn145.js"></script>
+      <script src="codecn146.js"></script>
+      <script src="codecn147.js"></script>
+      <script src="codecn148.js"></script>
+      <script src="codecn149.js"></script>
+      <script src="codecn150.js"></script>
+      <script src="codecn151.js"></script>
+      <script src="codecn152.js"></script>
+      <script src="codecn153.js"></script>
+      <script src="codecn154.js"></script>
+      <script src="codecn155.js"></script>
+      <script src="codecn156.js"></script>
+      <script src="codecn157.js"></script>
+      <script src="codecn158.js"></script>
+      <script src="codecn160.js"></script>
+      <script src="codecn161.js"></script>
+      <script src="codecn162.js"></script>
+      <script src="codecn163.js"></script>
+      <script src="codecn164.js"></script>
+      <script src="codecn165.js"></script>
+      <script src="codecn166.js"></script>
+      <script src="codecn167.js"></script>
+      <script src="codecn168.js"></script>
+      <script src="codecn169.js"></script>
+      <script src="codecn170.js"></script>
+      <script src="codecn171.js"></script>
+      <script src="codecn172.js"></script>
+      <script src="codecn173.js"></script>
+      <script src="codecn174.js"></script>
+      <script src="codecn175.js"></script>
+      <script src="codecn176.js"></script>
+      <script src="codecn177.js"></script>
+      <script src="codecn178.js"></script>
+      <script src="codecn179.js"></script>
+      <script src="codecn180.js"></script>
+      <script src="codecn181.js"></script>
+      <script src="codecn182.js"></script>
+      <script src="codecn183.js"></script>
+      <script src="codecn184.js"></script>
+      <script src="codecn185.js"></script>
+      <script src="codecn186.js"></script>
+      <script src="codecn187.js"></script>
+      <script src="codecn188.js"></script>
+      <script src="codecn189.js"></script>
+      <script src="codecn190.js"></script>
+      <script src="codecn191.js"></script>
+      <script src="codecn192.js"></script>
+      <script src="codecn193.js"></script>
+      <script src="codecn194.js"></script>
+      <script src="codecn195.js"></script>
+      <script src="codecn196.js"></script>
+      <script src="codecn197.js"></script>
+      <script src="codecn198.js"></script>
+      <script src="codecn199.js"></script>
+      <script src="codecn200.js"></script>
+      <script src="app.js"></script>
+      <script src="key.js"></script>
+      <script src="codedata.js"></script>
+      <script src="codedata1.js"></script>
+      <script src="codedata2.js"></script>
+      <script src="codedata3.js"></script>
+      <script src="codedata4.js"></script>
+      <script src="codedata5.js"></script>
+      <script src="codedata6.js"></script>
+      <script src="codedata7.js"></script>
+      <script src="codedata8.js"></script>
+      <script src="codedata9.js"></script>
+      <script src="codedata10.js"></script>
+      <script src="codedata11.js"></script>
+      <script src="codedata12.js"></script>
+      <script src="codedata13.js"></script>
+      <script src="codedata14.js"></script>
+      <script src="codedata15.js"></script>
+      <script src="codedata16.js"></script>
+      <script src="codedata17.js"></script>
+      <script src="codedata18.js"></script>
+      <script src="codedata19.js"></script>
+      <script src="codedata20.js"></script>
+      <script src="codedata21.js"></script>
+      <script src="codedata22.js"></script>
+      <script src="codedata23.js"></script>
+      <script src="codedata24.js"></script>
+      <script src="codedata25.js"></script>
+      <script src="codedata26.js"></script>
+      <script src="codedata27.js"></script>
+      <script src="codedata28.js"></script>
+      <script src="codedata29.js"></script>
+      <script src="codedata30.html"></script>
+      <script src="codedata31.html"></script>
+      <script src="codedata32.html"></script>
+      <script src="codedata33.html"></script>
+      <script src="codedata34.html"></script>
+      <script src="codedata35.html"></script>
+      <script src="codedata36.html"></script>
+      <script src="codedata37.html"></script>
+      <script src="codedata38.html"></script>
+      <script src="codedata39.html"></script>
+      <script src="codedata40.html"></script>
+      <script src="codedata41.html"></script>
+      <script src="codedata42.html"></script>
+      <script src="codedata43.html"></script>
+      <script src="codedata44.html"></script>
+      <script src="codedata45.html"></script>
+      <script src="codedata46.html"></script>
+      <script src="codedata47.html"></script>
+      <script src="codedata48.html"></script>
+      <script src="codedata49.html"></script>
+      <script src="codedata50.html"></script>
+      <script src="codedata51.html"></script>
+      <script src="codedata52.html"></script>
+      <script src="codedata53.html"></script>
+      <script src="codedata54.html"></script>
+      <script src="codedata55.html"></script>
+      <script src="codedata56.html"></script>
+      <script src="codedata57.html"></script>
+      <script src="codedata58.html"></script>
+      <script src="codedata59.html"></script>
+      <script src="codedata60.html"></script>
+      <script src="codedata61.html"></script>
+      <script src="codedata62.html"></script>
+      <script src="codedata63.html"></script>
+      <script src="codedata64.html"></script>
+      <script src="codedata65.html"></script>
+      <script src="codedata66.html"></script>
+      <script src="codedata67.html"></script>
+      <script src="codedata68.html"></script>
+      <script src="codedata69.html"></script>
+      <script src="codedata70.html"></script>
+      <script src="codedata71.html"></script>
+      <script src="codedata72.html"></script>
+      <script src="codedata73.html"></script>
+      <script src="codedata74.html"></script>
+      <script src="codedata75.html"></script>
+      <script src="codedata76.html"></script>
+      <script src="codedata77.html"></script>
+      <script src="codedata78.html"></script>
+      <script src="codedata79.html"></script>
+      <script src="codedata80.html"></script>
+      <script src="codedata81.html"></script>
+      <script src="codedata82.html"></script>
+      <script src="codedata83.html"></script>
+      <script src="codedata84.html"></script>
+      <script src="codedata85.html"></script>
+      <script src="codedata86.html"></script>
+      <script src="codedata87.html"></script>
+      <script src="codedata88.html"></script>
+      <script src="codedata89.html"></script>
+      <script src="codedata90.html"></script>
+      <script src="codedata91.html"></script>
+      <script src="codedata92.html"></script>
+      <script src="codedata93.html"></script>
+      <script src="codedata94.html"></script>
+      <script src="codedata95.html"></script>
+      <script src="codedata96.html"></script>
+      <script src="codedata97.html"></script>
+      <script src="codedata98.html"></script>
+      <script src="codedata99.html"></script>
+      <script src="codedata100.html"></script>
+      <script src="codedata101.html"></script>
+      <script src="codedata102.html"></script>
+      <script src="codedata103.html"></script>
+      <script src="codedata104.html"></script>
+      <script src="codedata105.html"></script>
+      <script src="codedata106.html"></script>
+      <script src="codedata107.html"></script>
+      <script src="codedata108.html"></script>
+      <script src="codedata109.html"></script>
+      <script src="codedata110.html"></script>
+      <script src="codedata111.html"></script>
+      <script src="codedata112.html"></script>
+      <script src="codedata113.html"></script>
+      <script src="codedata114.html"></script>
+      <script src="codedata115.html"></script>
+      <script src="codedata116.html"></script>
+      <script src="codedata117.html"></script>
+      <script src="codedata118.html"></script>
+      <script src="codedata119.html"></script>
+      <script src="codedata120.html"></script>
+      <script src="codedata121.html"></script>
+      <script src="codedata122.html"></script>
+      <script src="codedata123.html"></script>
+      <script src="codedata124.html"></script>
+      <script src="codedata125.html"></script>
+      <script src="codedata126.html"></script>
+      <script src="codedata127.html"></script>
+      <script src="codedata128.html"></script>
+      <script src="codedata129.html"></script>
+      <script src="codedata130.html"></script>
+      <script src="codedata131.html"></script>
+      <script src="codedata132.html"></script>
+      <script src="codedata133.html"></script>
+      <script src="codedata134.html"></script>
+      <script src="codedata135.html"></script>
+      <script src="codedata136.html"></script>
+      <script src="codedata137.html"></script>
+      <script src="codedata138.html"></script>
+      <script src="codedata139.html"></script>
+      <script src="codedata140.html"></script>
+      <script src="codedata141.html"></script>
+      <script src="codedata142.html"></script>
+      <script src="codedata143.html"></script>
+      <script src="codedata144.html"></script>
+      <script src="codedata145.html"></script>
+      <script src="codedata146.html"></script>
+      <script src="codedata147.html"></script>
+      <script src="codedata148.html"></script>
+      <script src="codedata149.html"></script>
+      <script src="codedata150.html"></script>
+      <script src="codedata151.html"></script>
+      <script src="codedata152.html"></script>
+      <script src="codedata153.html"></script>
+      <script src="codedata154.html"></script>
+      <script src="codedata155.html"></script>
+      <script src="codedata156.html"></script>
+      <script src="codedata157.html"></script>
+      <script src="codedata158.html"></script>
+      <script src="codedata159.html"></script>
+      <script src="codedata160.html"></script>
+      <script src="codedata161.html"></script>
+      <script src="codedata162.html"></script>
+      <script src="codedata163.html"></script>
+      <script src="codedata164.html"></script>
+      <script src="codedata165.html"></script>
+      <script src="codedata166.html"></script>
+      <script src="codedata167.html"></script>
+      <script src="codedata168.html"></script>
+      <script src="codedata169.html"></script>
+      <script src="codedata170.html"></script>
+      <script src="codedata171.html"></script>
+      <script src="codedata172.html"></script>
+      <script src="codedata173.html"></script>
+      <script src="codedata174.html"></script>
+      <script src="codedata175.html"></script>
+      <script src="codedata176.html"></script>
+      <script src="codedata177.html"></script>
+      <script src="codedata178.html"></script>
+      <script src="codedata179.html"></script>
+      <script src="codedata180.html"></script>
+      <script src="codedata181.html"></script>
+      <script src="codedata182.html"></script>
+      <script src="codedata183.html"></script>
+      <script src="codedata184.html"></script>
+      <script src="codedata185.html"></script>
+      <script" src="codedata186.html"></script>
+      <script src="codedata187.html"></script>
+      <script src="codedata188.html"></script>
+      <script src="codedata189.html"></script>
+      <script src="codedata190.html"></script>
+      <script src="codedata191.html"></script>
+      <script src="codedata192.html"></script>
+      <script src="codedata193.html"></script>
+      <script src="codedata194.html"></script>
+      <script src="codedata195.html"></script>
+      <script src="codedata196.html"></script>
+      <script src="codedata197.html"></script>
+      <script src="codedata198.html"></script>
+      <script src="codedata199.html"></script>
+      <script src="codedata200.html"></script>
+      <script src="codedata201.html"></script>
+      <script src="codedata202.html"></script>
+      <script src="codeplayload.js"></script>
+    </body>
+  </html>
