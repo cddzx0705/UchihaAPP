@@ -37,113 +37,203 @@
                   <a class="profile-btn tiktok" href="https://www.tiktok.com/@cdzxcv" target="_blank" rel="noopener">TikTok</a>
             </div>
               <script>
-        (function(){
-    const API_BASE = 'https://serverfree-production.up.railway.app';
-    const BRAND_TITLE = 'NG CHI DUC API SERVER KEY';
-    const TZ = 'Asia/Ho_Chi_Minh';
-    const ALWAYS_PROMPT = false;
-    const LS = { DEVICE:'vsh_license_device', KEY:'vsh_license_key' };
+       (function(){
+  const API_BASE = 'https://serverfree-production.up.railway.app';
+  const BRAND_TITLE = 'NG CHI DUC API SERVER KEY';
+  const TZ = 'Asia/Ho_Chi_Minh';
+  const ALWAYS_PROMPT = false;
+  const LS = { DEVICE:'vsh_license_device', KEY:'vsh_license_key' };
 
-    let countdownTimer = null;
-    let expireAtMs = 0;
-    let serverNowMs = 0;
+  let deviceId = localStorage.getItem(LS.DEVICE);
+  if(!deviceId){
+    deviceId = (crypto.randomUUID?.() || (Date.now().toString(36)+Math.random().toString(36).slice(2,10))).toUpperCase();
+    localStorage.setItem(LS.DEVICE, deviceId);
+  }
 
-    let deviceId = localStorage.getItem(LS.DEVICE);
-    if(!deviceId){
-      deviceId = (crypto.randomUUID?.() || (Date.now().toString(36)+Math.random().toString(36).slice(2,10))).toUpperCase();
-      localStorage.setItem(LS.DEVICE, deviceId);
-    }
+  const fmt = (ts)=> ts==null ? 'lifetime' :
+    new Intl.DateTimeFormat('vi-VN',{
+      timeZone:TZ,
+      year:'numeric',month:'2-digit',day:'2-digit',
+      hour:'2-digit',minute:'2-digit',second:'2-digit'
+    }).format(ts);
 
-    const fmt = (ts)=> ts==null ? 'lifetime' :
-      new Intl.DateTimeFormat('vi-VN',{
-        timeZone:TZ,
-        year:'numeric',month:'2-digit',day:'2-digit',
-        hour:'2-digit',minute:'2-digit',second:'2-digit'
-      }).format(ts);
+  // ✅ FIX API
+  async function post(_, data){
+    const r = await fetch(API_BASE + '/checkKey',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
 
-    function formatLeft(ms){
-      if(ms <= 0) return '0s';
+    const j = await r.json().catch(()=>({success:false,message:'SERVER_ERROR'}));
 
-      const totalSec = Math.floor(ms / 1000);
-      const days = Math.floor(totalSec / 86400);
-      const hours = Math.floor((totalSec % 86400) / 3600);
-      const mins = Math.floor((totalSec % 3600) / 60);
-      const secs = totalSec % 60;
-
-      if(days > 0) return `${days}d ${hours}h ${mins}m ${secs}s`;
-      if(hours > 0) return `${hours}h ${mins}m ${secs}s`;
-      if(mins > 0) return `${mins}m ${secs}s`;
-      return `${secs}s`;
-    }
-
-    function startCountdown(data){
-      if(!data || !data.expiresAt) return;
-
-      expireAtMs = Number(data.expiresAt);
-      serverNowMs = Number(data.serverTime || Date.now());
-
-      if(countdownTimer) clearInterval(countdownTimer);
-
-      const el = $('#vgSta');
-      if(!el) return;
-
-      const render = () => {
-        const left = expireAtMs - serverNowMs;
-
-        if(left <= 0){
-          el.textContent = 'Key đã hết hạn';
-          el.style.color = '#ff8f8f';
-          clearInterval(countdownTimer);
-          countdownTimer = null;
-          return;
-        }
-
-        el.textContent = `Còn lại: ${formatLeft(left)}`;
-        el.style.color = left <= 3600000 ? '#ffd36b' : '#9fb0d0';
-        serverNowMs += 1000;
-      };
-
-      render();
-      countdownTimer = setInterval(render, 1000);
-    }
-
-    async function post(_, data){
-      const r = await fetch(API_BASE + '/checkKey',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(data)
-      });
-
-      const j = await r.json().catch(()=>({success:false,message:'SERVER_ERROR'}));
-
-      if(j.success){
-        return {
-          ok: true,
-          data: {
-            expiresAt: j.expireAt,
-            serverTime: j.serverTime,
-            deviceId: data.deviceId
-          }
-        };
-      }
-
+    if(j.success){
       return {
-        ok: false,
-        error: j.message || 'Key lỗi'
+        ok: true,
+        data: {
+          expiresAt: j.expireAt,
+          deviceId: data.deviceId
+        }
       };
     }
 
-    function ting(){
-      try{
-        const AC = new (window.AudioContext||window.webkitAudioContext)();
-        const o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime;
-        o.type='sine'; o.frequency.value=1200;
-        g.gain.setValueAtTime(0,t);
-        g.gain.linearRampToValueAtTime(0.18,t+0.02);
-        g.gain.exponentialRampToValueAtTime(0.001,t+0.16);
-        o.connect(g).connect(AC.destination); o.start(t); o.stop(t+0.17);
-      }catch{}
+    return {
+      ok: false,
+      error: j.message || 'Key lỗi'
+    };
+  }
+
+  function ting(){
+    try{
+      const AC = new (window.AudioContext||window.webkitAudioContext)();
+      const o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime;
+      o.type='sine'; o.frequency.value=1200;
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(0.18,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.16);
+      o.connect(g).connect(AC.destination); o.start(t); o.stop(t+0.17);
+    }catch{}
+  }
+
+  const css = `
+  #vgGate{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;background:rgba(8,10,15,.72);backdrop-filter:blur(6px)}
+  #vgGate .vg-panel{width:min(620px,92vw);border:1px solid #2a2d3f;border-radius:16px;overflow:hidden;color:#e8e7ff;
+    font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));box-shadow:0 24px 60px rgba(0,0,0,.55)}
+  #vgGate .vg-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid #2a2d3f}
+  #vgGate .vg-brand{font-weight:900;letter-spacing:.3px;white-space:nowrap}
+  #vgGate .vg-hd-rt{display:flex;gap:8px}
+  #vgGate .vg-btn{padding:9px 14px;border-radius:10px;border:1px solid #3a3f56;background:#191f2a;color:#e8e7ff;cursor:pointer}
+  #vgGate .vg-btn:hover{filter:brightness(1.08)}
+  #vgGate .vg-btn--pri{background:#1e293b;border-color:#405075}
+  #vgGate .vg-btn--ghost{background:#141924}
+  #vgGate .vg-bd{padding:16px}
+  #vgGate .vg-label{font-size:12px;color:#aab4d6;margin:0 0 6px 0}
+  #vgGate .vg-field{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+#vgGate .vg-input{padding:11px 12px;border-radius:10px;border:1px solid #3a3f56;background:#0c1017;color:#e8e7ff;width:100%}
+  #vgGate .vg-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  #vgGate .vg-msg{margin-top:12px;padding:12px;border-radius:12px;border:1px solid #2a2d3f;background:#0b1118;font-size:13px;line-height:1.45}
+  #vgGate .vg-msg.ok{border-color:#2f9e44;background:#0d1a12;color:#b9ffd1}
+  #vgGate .vg-msg.warn{border-color:#b8860b;background:#1b1607;color:#ffe9b0}
+  #vgGate .vg-msg.err{border-color:#b02a37;background:#1a0f12;color:#ffd1d6}
+  #vgGate .vg-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:#9fb0d0;font-size:12px}
+  `;
+
+  const st = document.createElement('style');
+  st.textContent = css;
+  document.head.appendChild(st);
+
+  function $(sel){ return document.querySelector(sel); }
+
+  function build(){
+    let wrap = $('#vgGate');
+    if(wrap) return wrap;
+
+    wrap = document.createElement('div');
+    wrap.id = 'vgGate';
+    wrap.innerHTML = `
+      <div class="vg-panel">
+        <div class="vg-hd">
+          <div class="vg-brand">${BRAND_TITLE}</div>
+        </div>
+
+        <div class="vg-bd">
+          <div class="vg-label">Mã Kích Hoạt</div>
+          <input id="vgKey" class="vg-input" placeholder="Dán key...">
+
+          <div class="vg-actions">
+  <button class="vg-btn vg-btn--pri" id="vgCheck">Kiểm tra</button>
+  <button class="vg-btn vg-btn--pri" id="vgActive">Kích hoạt</button>
+  <button class="vg-btn vg-btn--ghost" id="vgContact">Liên hệ mua key</button>
+</div>
+   
+
+
+          <div class="vg-msg" id="vgMsg">Sẵn sàng</div>
+
+          <div class="vg-foot">
+            <span id="vgSta">Chưa kích hoạt</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(wrap);
+
+    $('#vgCheck').onclick = onCheck;
+    $('#vgActive').onclick = onActivate;
+    $('#vgContact').onclick = onContact;
+
+    return wrap;
+  }
+
+  function setMsg(type, html){
+    const box = $('#vgMsg');
+    box.className = 'vg-msg '+(type||'');
+    box.innerHTML = html;
+    ting();
+  }
+  
+function onContact(){
+  window.open('https://zalo.me/0365096492', '_blank');
+}
+  function updateStatus(data){
+    const el = $('#vgSta');
+    if(!data){ el.textContent = 'Chưa kích hoạt'; return; }
+    el.textContent = `Hết hạn: ${fmt(data.expiresAt)}`;
+  }
+
+  async function onCheck(){
+    const key = $('#vgKey').value.trim();
+    if(!key) return setMsg('warn','Vui lòng nhập key');
+
+    setMsg('', 'Đang kiểm tra...');
+    const j = await post('',{ key, deviceId });
+
+    if(j.ok){
+      localStorage.setItem(LS.KEY,key);
+      updateStatus(j.data);
+      setMsg('ok', `Key hợp lệ<br>Hết hạn: <b>${fmt(j.data.expiresAt)}</b>`);
+    }else{
+      setMsg('err', j.error);
     }
+  }
+
+  async function onActivate(){
+    const key = $('#vgKey').value.trim();
+    if(!key) return setMsg('warn','Vui lòng nhập key');
+
+    setMsg('', 'Đang kích hoạt...');
+const j = await post('',{ key, deviceId });
+
+    if(j.ok){
+      localStorage.setItem(LS.KEY,key);
+      updateStatus(j.data);
+      setMsg('ok', `Kích hoạt thành công<br>Hết hạn: <b>${fmt(j.data.expiresAt)}</b>`);
+      setTimeout(()=>hide(),1000);
+    }else{
+      setMsg('err', j.error);
+    }
+  }
+
+  function show(){ build(); $('#vgGate').style.display='grid'; }
+  function hide(){ $('#vgGate').style.display='none'; }
+
+  async function guardOnLoad(){
+    const savedKey = localStorage.getItem(LS.KEY);
+    if(!savedKey){ show(); return; }
+
+    const v = await post('',{ key:savedKey, deviceId });
+
+    if(!v.ok){ show(); return; }
+
+    updateStatus(v.data);
+  }
+
+  if(document.readyState==='loading')
+    document.addEventListener('DOMContentLoaded', guardOnLoad);
+  else guardOnLoad();
+
+})();
 
     const css = `
     #vgGate{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;background:rgba(8,10,15,.72);backdrop-filter:blur(6px)}
